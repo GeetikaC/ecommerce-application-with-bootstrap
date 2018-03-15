@@ -1,0 +1,11 @@
+<div id="error">
+  
+</div>
+<%= form_for(@category, remote: true) do |c| %>
+
+	<label for="category_name">Name: </label> <br/>
+	<%= c.text_field :name, placeholder: "Enter Category Name" %> <br/>
+
+	<%= c.submit %>
+
+<% end %>

@@ -1,0 +1,17 @@
+<h2>My Reviews</h2>
+<% if @reviews.empty? %>
+	<p>You have not written any reviews.</p>
+<% else %>
+	<ol>
+		<% @reviews.each do |review| %>
+			<li>
+				<% Product.where('id=?',review.product_id).each do |product| %>
+					Product: <%= product.name %><br/>
+				<% end %>
+					Comment: <%= review.body %><br/>
+					Rating: <%= review.rating %><br/>
+					Posted on: <%= review.updated_at %><br/> 
+			</li>
+		<% end %>
+	</ol>
+<% end %>

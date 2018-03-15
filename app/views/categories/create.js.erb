@@ -1,0 +1,8 @@
+<% if @category.errors.any? %>
+  $('#error').html("<%= escape_javascript render 'error' %>");
+<% else %>
+  $('#error').hide();
+  $('#newCategory').modal('hide');
+  $.growl.notice({ message: "Successfully added the category!" });
+  $('#categoryList').prepend("<%= escape_javascript render 'category' %>");
+<% end %>

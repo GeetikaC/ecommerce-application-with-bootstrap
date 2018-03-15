@@ -1,0 +1,3 @@
+<%= link_to cart_line_items_path, class: "nav-link" do %>
+  Your Cart <span class="badge badge-info"><%= current_user.cart_line_items.pluck(:quantity).inject(:+) %></span> ||
+<% end %>

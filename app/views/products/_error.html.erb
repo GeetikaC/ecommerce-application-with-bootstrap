@@ -1,0 +1,10 @@
+<div class="alert alert-danger">
+	<% if @product.errors.any? %>
+		<h3>You form could not be saved because:</h3>
+		<ul>
+		<% @product.errors.full_messages.each do |msg| %>
+			<li><%= msg %><br/></li>
+		<% end %>
+		</ul>
+	<% end %>
+</div>

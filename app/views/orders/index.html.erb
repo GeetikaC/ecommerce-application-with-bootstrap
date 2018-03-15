@@ -1,0 +1,50 @@
+<h2>All orders</h2>
+<% if @orders.empty? %>
+	<p>No orders found.</p>
+<% else %>
+	<h2>Order Placed: </h2>
+	<% @orders.each do |order| %>
+	<div class="row">
+			<% order.order_line_items.each do |order_line_item| %>
+				<div class="col-md-3">
+			      <div class="card">
+			        <a href="/products/<%= order_line_item.product.id %>">
+			        <img class="card-img-top" src="<%= order_line_item.product.feature_image_url %>">
+			        </a>
+			        <div class="card-body">
+			          <h5 class="card-title"><%= link_to order_line_item.product.name, product_path(order_line_item.product.id) %></h5>
+			          <p class="card-text"><%= order_line_item.product.description.truncate(200) %></p>
+			          <p class="card-text">Price: <i class="fa fa-inr"></i><%= order_line_item.price %></p>
+			          <p class="card-text">Quantity: <%= order_line_item.quantity %></p>
+			        </div>
+			        <div class="card-footer">
+			          <small class="text-muted">
+			            Found in: <%= Category.find(order_line_item.product.category_id).name %>
+			          </small>
+			        </div>
+			      </div>
+			    </div>
+			<% end %>
+			<div class="col-md-3">
+			<div class="card">
+			<div class="card-body">
+				<h3 class="card-title">Order Details</h3>
+				<p class="card-text">Order number: <%= order.order_number %></p>
+				<p class="card-text">Order placed on: <%= order.order_date %></p>
+				<p class="card-text">Address:<br/>
+				<%= order.address.name %><br/>
+				<%= order.address.pincode %><br/>
+				<%= order.address.street %><br/>
+				<%= order.address.landmark %><br/>
+				<%= order.address.city %></p>
+				<p class="card-text">Total: <i class="fa fa-inr"></i><%= order.total %></p>
+			</div>
+			<div class="card-footer">
+	          <small class="text-muted">
+	          	Delivered?: <%= order.is_delivered %>
+	          </small>
+	        </div>
+			</div>
+			</div>
+		<% end %>
+<% end %>

@@ -1,0 +1,198 @@
+<h2><%= @product.name %></h2>
+<div class="row">
+	<div class="col-md-6">
+		<p> 
+		<% if (user_signed_in?) && (can? :update, @product) %>
+		<%= link_to "Edit", edit_product_path(@product.id) %> | 
+		<%= link_to "Delete", product_path(@product.id), method: :delete, data: {confirm: "Are you sure?"} %>
+		<% end %>
+		</p>
+		<%= image_tag(@product.feature_image_url, size: "350x480") %>
+	</div>
+	<div class="col-md-6">
+		<p>Price: <%= @product.price %></p>
+		<p>Description: <%= @product.description %></p>
+		<p>Category: <%= Category.find(@product.category_id).name %></p>
+		<% if @product.cod_eligible %>
+			<p>COD Eligible</p><br/>
+		<% else %>
+			<p>COD Not Eligible</p><br/>
+		<% end %>
+
+		<h2> Add To Cart </h2>
+		<% if user_signed_in? %>
+			<%= form_for(@cart_line_item, remote: true) do |f| %>
+				<label class="form-group">Quantity </label>
+				<%= f.select :quantity, (1..10).to_a, class: "form-control" %> <br/>
+				<%= f.hidden_field :product_id, value: @product.id, class: "form-control" %>
+				<%= f.submit 'Add', class: "btn btn-primary" %>
+			<% end %>
+		<% else %>
+			<p> You need to be logged in to add this product to your cart. </p>
+		<% end %>
+	</div>
+</div>
+
+<div class="mb-5"></div>
+
+<div class="row">
+	
+	<div class="col-md-6">
+		<% if @product.reviews.empty? %>
+			<p>No Reviews found, be the first to review</p>
+		<% else %>
+		<h3>Listing reviews</h3>
+		<ol id="reviewList">
+			<% total = 0 %>
+			<% overall = 0 %>
+			<% count = 0 %>
+
+			<% @product.reviews.each do |review| %>
+				<li id="review_<%= review.id %>">
+					<b><%= review.user.username %></b> | 
+					<small><%= review.created_at %></small><br/>
+					Review: <%= review.body %><br/>
+					<% total += review.rating %>
+					<% count += 1 %>
+					Rating: <%= review.rating %><br/>
+					<% if (user_signed_in?) && (can? :update, review) %>
+					<%= link_to "Delete", review_path(review.id), method: :delete, data: {confirm: "Are you sure you want to delete this review?"}, remote: true %>
+					<% end %>
+				</li>
+			<% end %>
+			<% overall = total/count %>
+			<h5>Overall Rating: <%= overall.round(1) %></h5>
+		</ol>
+		<% end %>
+	</div>
+	<div class="col-md-6">
+		<p id="reviewNotice"></p>
+		<% if user_signed_in? %>
+		<h3>Add your review</h3>
+		<div id="reviewError"></div>
+		<div>
+			<%= form_for(@review, remote: true) do |f| %>
+				<label for="review_body">Comment:</label><br/>
+				<%= f.text_area :body, class: "form-control", id: "review_body" %>
+				<span id="bodyError"></span>
+				<%= f.hidden_field :product_id, value: @product.id %><br/>
+				<label for="review_rating">Rating:</label>
+				<%= f.radio_button :rating, 1 %> 1
+				<%= f.radio_button :rating, 2 %> 2
+				<%= f.radio_button :rating, 3 %> 3
+				<%= f.radio_button :rating, 4 %> 4
+				<%= f.radio_button :rating, 5 %> 5 <br/>
+				<span id="ratingError"></span><br/>
+				<%= f.submit "Post Review", class: "btn btn-primary", id: "submitRev" %>
+			<% end %>
+		</div>
+		<% end %>	
+	</div>
+</div>
+
+
+<div class="mb-5"></div>
+<% similar_products = Product.where("category_id=? AND name != ?", @product.category.id, @product.name) %>
+<% if !(similar_products.empty?) %>
+<h2>Customers who searched <%= @product.name %> also browsed:</h2>
+<div class="row" id="productList">
+  <% similar_products.each do |product| %>
+    <div class="col-md-3">
+      <div class="card">
+        <a href="/products/<%= product.id %>">
+        <img class="card-img-top" src="<%= product.feature_image_url %>">
+        </a>
+        <div class="card-body">
+          <h5 class="card-title"><%= link_to product.name, product_path(product.id) %></h5>
+          <p class="card-text">
+          <% total = 0.0 %>
+          <% sum = 0.0 %>
+          <% rating = 0.0 %>
+          <% if !(product.reviews.pluck(:rating).empty?) %>
+            <% total = product.reviews.pluck(:rating).count %>
+            <% sum = product.reviews.pluck(:rating).inject(:+) %>
+            <% rating = sum.to_f / total.to_f %>
+            Rating: <%= rating.round(1) %>
+          <% end %>
+          </p>
+          <p class="card-text"><%= product.description.truncate(200) %></p>
+          <p class="card-text">Price: <i class="fa fa-inr"></i><%= product.price %></p>
+          <% if user_signed_in? %>
+            <%= form_for CartLineItem.new do |f| %>
+              <%= f.hidden_field :product_id, value: product.id %>
+              <%= f.hidden_field :quantity, value: 1 %>
+              <%= f.submit 'Add to cart', class: "btn btn-primary" %>
+            <% end %>
+            <%= form_for Wishlist.new do |f| %>
+              <%= f.hidden_field :product_id, value: product.id %>
+              <%= f.submit 'Add to Wishlist', class: "btn btn-primary" %>
+            <% end %>
+          <% else %>
+            <p> You need to be logged in to add this product to your cart. </p>
+          <% end %>
+        </div>
+        <div class="card-footer">
+          <small class="text-muted">
+            Found in: <%= Category.find(product.category_id).name %>
+          </small>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>
+<% end %>
+
+<script>
+	var bodyHandle = document.getElementById('review_body');
+	var bodyErrorHandle = document.getElementById('bodyError');
+	var ratingHandle = document.getElementById('review_rating');
+	var ratingErrorHandle = document.getElementById('ratingError');
+	var formHandle = document.getElementById('new_review');
+	var submitHandle = document.getElementById('submitRev');
+
+	var validator = {
+		bodyValid: false,
+		ratingValid: false
+	}
+
+	function bodyValidation(){
+		if (bodyHandle.value === "") {
+			validator.bodyValid = false;
+			bodyErrorHandle.innerHTML = "Can't be blank";
+		}
+		else if (bodyHandle.value.length < 10) {
+			validator.bodyValid = false;
+			bodyErrorHandle.innerHTML = "Can't be less than 10 characters";
+		}
+		else{
+			validator.bodyValid = true;
+			bodyErrorHandle.innerHTML = "";
+		}
+	}
+
+	function ratingValidation(){
+		if (ratingHandle.value === "") {
+			validator.ratingValid = false;
+			ratingErrorHandle.innerHTML = "Can't be blank";
+		}
+		else{
+			validator.ratingValid = true;
+			ratingErrorHandle.innerHTML = "";
+		}
+	}
+
+	formHandle.addEventListener('submit', function(e){
+		bodyValidation();
+		ratingValidation();
+
+		if (Object.values(validator).includes(false)) {
+			e.preventDefault();
+			setTimeout(function(){
+				submitHandle.disabled = false;
+			},100);
+		}
+		else {
+		}
+	}, false);
+
+</script>

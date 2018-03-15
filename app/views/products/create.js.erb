@@ -1,0 +1,8 @@
+<% if @product.errors.any? %>
+  $('#error').html("<%= escape_javascript render 'error' %>");
+<% else %>
+  $('#error').hide();
+  $('#newProduct').modal('hide');
+  $.growl.notice({ message: "Successfully added the product!" });
+  $('#productList').prepend("<%= escape_javascript render 'product' %>");
+<% end %>

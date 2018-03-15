@@ -1,0 +1,10 @@
+<div class="alert alert-danger">
+	<% if @category.errors.any? %>
+		<h3>Category couldn't be saved because:</h3>
+		<ul>
+		<% @category.errors.full_messages.each do |msg| %>
+			<li><%= msg %></li>
+		<% end %>
+		</ul>
+	<% end %>
+</div>

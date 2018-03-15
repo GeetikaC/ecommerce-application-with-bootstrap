@@ -1,0 +1,132 @@
+<%= form_for @address, html: {id: 'address_form'} do |f| %>
+
+	<% if @address.errors.any? %>
+		<p>Address couldn't be saved due to following errors:</p>
+		<ol>
+		<% @address.errors.full_messages.each do |msg| %>
+			<li><%= msg %></li>
+		<% end %>
+		</ol>
+	<% end %>
+		<label for="name">Name:</label><br/>
+		<%= f.text_field :name, placeholder: "Full Name", id: "address_name" %>
+		<span id="nameErrorHandle"></span><br/>
+
+		<label for="pincode">Pincode:</label><br/>
+		<%= f.text_field :pincode, placeholder: "PIN", id: "address_pin" %>
+		<span id="pinErrorHandle"></span><br/>
+
+		<label for="street">Street:</label><br/>
+		<%= f.text_area :street, placeholder: "Street", id: "street" %>
+		<span id="streetErrorHandle"></span><br/>
+
+		<label for="landmark">Landmark:</label><br/>
+		<%= f.text_field :landmark, placeholder: "Landmark", id: "landmark" %>
+		<span id="landmarkErrorHandle"></span><br/>
+
+		<label for="city">City:</label><br/>
+		<%= f.text_field :city, placeholder: "City", id: "city" %>
+		<span id="cityErrorHandle"></span> <br/>
+
+		<%= f.submit "Submit", id: "submit" %>
+
+<% end %>
+
+<script type="text/javascript">
+	var numberFormat = /^\d+$/;
+
+	var nameHandle = document.getElementById('address_name');
+	var pinHandle = document.getElementById('address_pin');
+	var streetHandle = document.getElementById('street');
+	var landmarkHandle = document.getElementById('landmark');
+	var cityHandle = document.getElementById('city');
+
+	var formHandle = document.getElementById('address_form');
+	var submitHandle = document.getElementById('submit');
+
+	var validator = {
+		nameValid: false,
+		pinValid: false,
+		streetValid: false,
+		landmarkValid: false,
+		cityValid: false
+	}
+
+	function nameValidation(){
+		if (nameHandle.value === "") {
+			validator.nameValid = false;
+			nameErrorHandle.innerHTML = "Can't be blank";
+		}
+		else{
+			validator.nameValid = true;
+			nameErrorHandle.innerHTML = "";
+		}
+	}
+
+	function pinValidation(){
+		if (pinHandle.value === "") {
+			validator.pinValid = false;
+			pinErrorHandle.innerHTML = "Can't be blank";
+		}
+		else if (!numberFormat.test(pinHandle.value)) {
+			validator.pinValid = false;
+			pinErrorHandle.innerHTML = "Only numbers allowed";
+		}
+		else{
+			validator.pinValid = true;
+			pinErrorHandle.innerHTML = "";
+		}
+	}
+
+	function streetValidation(){
+		if (streetHandle.value === "") {
+			validator.streetValid = false;
+			streetErrorHandle.innerHTML = "Can't be blank";
+		}
+		else{
+			validator.streetValid = true;
+			streetErrorHandle.innerHTML = "";
+		}
+	}
+
+	function landmarkValidation(){
+		if (landmarkHandle.value === "") {
+			validator.landmarkValid = false;
+			landmarkErrorHandle.innerHTML = "Can't be blank";
+		}
+		else{
+			validator.landmarkValid = true;
+			landmarkErrorHandle.innerHTML = "";
+		}
+	}
+
+	function cityValidation(){
+		if (cityHandle.value === "") {
+			validator.cityValid = false;
+			cityErrorHandle.innerHTML = "Can't be blank";
+		}
+		else{
+			validator.cityValid = true;
+			cityErrorHandle.innerHTML = "";
+		}
+	}
+
+	formHandle.addEventListener('submit', function(e){
+		nameValidation();
+		pinValidation();
+		streetValidation();
+		landmarkValidation();
+		cityValidation();
+
+		if (Object.values(validator).includes(false)) {
+			e.preventDefault();
+			setTimeout(function(){
+				submitHandle.disabled = false;
+			},100);
+		}
+		else{
+		}
+	}, false);
+
+
+</script>

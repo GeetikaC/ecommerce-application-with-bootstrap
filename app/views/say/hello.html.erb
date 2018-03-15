@@ -1,0 +1,10 @@
+<h2>Hello World</h2>
+<a href="/say/goodbye">BYE?</a>
+<% fruits = ["mango", "papaya", "banana", "orange", "apple"] %>
+
+<h3>Listing Fruits(<%= fruits.length %>)</h3>
+<ol>
+	<% fruits.each_with_index do |fruit,index| %>
+	<li><%= index+1 %>. <%= fruit %> <br/></li>
+	<% end %>
+</ol>

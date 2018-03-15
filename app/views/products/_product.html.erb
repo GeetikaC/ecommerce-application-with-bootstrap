@@ -1,0 +1,41 @@
+<div class="col-md-3">
+      <div class="card">
+        <a href="/products/<%= @product.id %>">
+        <img class="card-img-top" src="<%= @product.feature_image_url %>">
+        </a>
+        <div class="card-body">
+          <h5 class="card-title"><%= link_to @product.name, product_path(@product.id) %></h5>
+          <p class="card-text">
+          <% total = 0.0 %>
+          <% sum = 0.0 %>
+          <% rating = 0.0 %>
+          <% if !(@product.reviews.pluck(:rating).empty?) %>
+            <% total = @product.reviews.pluck(:rating).count %>
+            <% sum = @product.reviews.pluck(:rating).inject(:+) %>
+            <% rating = sum.to_f / total.to_f %>
+            Rating: <%= rating %>
+          <% end %>
+          </p>
+          <p class="card-text"><%= @product.description.truncate(200) %></p>
+          <p class="card-text">Price: <i class="fa fa-inr"></i><%= @product.price %></p>
+          <% if user_signed_in? %>
+            <%= form_for CartLineItem.new do |f| %>
+              <%= f.hidden_field :product_id, value: @product.id %>
+              <%= f.hidden_field :quantity, value: 1 %>
+              <%= f.submit 'Add to cart', class: "btn btn-primary" %>
+            <% end %>
+            <%= form_for Wishlist.new do |f| %>
+              <%= f.hidden_field :product_id, value: @product.id %>
+              <%= f.submit 'Add to Wishlist', class: "btn btn-primary" %>
+            <% end %>
+          <% else %>
+            <p> You need to be logged in to add this product to your cart. </p>
+          <% end %>
+        </div>
+        <div class="card-footer">
+          <small class="text-muted">
+            Found in: <%= Category.find(@product.category_id).name %>
+          </small>
+        </div>
+      </div>
+    </div>

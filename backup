@@ -1,0 +1,64 @@
+ <li class="nav-item dropdown <%= controller.controller_name == 'courses' ? 'active' : '' %>">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Courses <span class="badge badge-info"><%= Course.count %></span>
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <% Course.all.each do |course| %>
+           <!--  <a class="dropdown-item" href="#">Action</a> -->
+            <%= link_to course.name, course, class: "dropdown-item" %>
+          <% end %>
+        </div>
+      </li
+
+
+
+      APPLICATION LAYOUTS PAGE, MAIN LINKS:
+       <% if user_signed_in? %>
+        Welcome <%= current_user.username %>
+        <%= link_to "Your Cart (#{current_user.cart_line_items.pluck(:quantity).inject(:+)})", cart_line_items_path %><br/>
+        <%= link_to "Addresses", addresses_path %>
+        <%= link_to "Reviews", reviews_path %>
+        <%= link_to "Wishlist", wishlists_path %>
+        <%= link_to "Orders", orders_path %>
+        <%= link_to "Account Settings", edit_user_registration_path %> |
+        <%= link_to "Logout", destroy_user_session_path, method: :delete %><br/>
+      <% else %>
+        <%= link_to "Register", new_user_registration_path %> | 
+        <%= link_to "Login", new_user_session_path %><br/>
+      <% end %>
+
+
+
+
+
+
+      PRODUCTS INDEX PAGE:
+      <h2>Listing Products(<% @products.length %>)</h2>
+<% if @products.empty? %>
+  <p>No products found.</p>
+<% else %>
+  <ol>
+    <% @products.each do |product| %>
+    <li>Name: <%= link_to product.name, product_path(product.id) %><br/>
+    INR: <%= product.price %><br/>
+    Description: <%= product.description %> <br/>
+    Category ID: <%= product.category_id %><br/>
+    Category: <%= Category.find(product.category_id).name %><br/>
+
+
+
+    <%= link_to "Add to Wishlist", controller: "wishlists", action: "index", id: product.id %> |
+    <%= link_to "Show", product_path(product.id) %> |
+    <% if (user_signed_in?) %>
+      <%= link_to "Add to cart", cart_line_items_path %>
+      <%= hidden_field :product_id, value: product.id %>
+    <% end %>
+
+    </li>
+    <% end %>
+  </ol>
+<% end %>
+
+<% if (user_signed_in?) && (can? :create, Product.new) %>
+  <%= link_to "Add Product", new_product_path %>
+<% end %>

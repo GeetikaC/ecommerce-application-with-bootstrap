@@ -1,0 +1,8 @@
+<% if @review.errors.any? %>
+	<h3>You review could not be saved because:</h3>
+	<ul>
+	<% @review.errors.full_messages.each do |msg| %>
+		<li><%= msg %><br/></li>
+	<% end %>
+	</ul>
+<% end %>

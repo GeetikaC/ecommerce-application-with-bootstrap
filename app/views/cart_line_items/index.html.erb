@@ -1,0 +1,59 @@
+<h2>Your Cart</h2>
+<% total = 0 %>
+<% if @cart_line_items.empty? %>
+	<p> Your cart is empty. Shop <%= link_to "here", products_path %> </p>
+<% else %>
+	<table class="table">
+	<thead>
+		<tr>
+			<th> Sl. No. </th>
+			<th> </th>
+			<th> Name </th>
+			<th> Price </th>
+			<th> Quantity </th>
+			<th> Total </th>
+			<th> Delete? </th>
+		</tr>
+	</thead>
+	<tbody>
+	<% @cart_line_items.each_with_index do |cart_line_item, index| %>
+		<tr>
+			<td><%= index+1 %></td>
+			<td><%= image_tag(cart_line_item.product.feature_image_url, size: "150x125") %></td>
+			<td><%= link_to cart_line_item.product.name, cart_line_item.product, target: "_blank" %></td>
+			<td><%= cart_line_item.product.price%></td>
+			<td><%= cart_line_item.quantity%></td>
+			<td><%= cart_line_item.product.price * cart_line_item.quantity%></td>
+			<% total += cart_line_item.product.price * cart_line_item.quantity %>
+			<td><%= link_to "Delete?", cart_line_item_path(cart_line_item.id), method: :delete, data: {confirm: "Are you sure you want to delete this item?"} %></td>
+		</tr>
+	<% end %>
+	</tbody>
+	</table>
+	<p>Total Amount: <%= total %></p>
+
+
+
+
+
+	<h2>Checkout</h2>
+	<%= form_for Order.new do |f| %>
+		<p>Select Address to deliever to</p>
+		<% if current_user.addresses.empty? %>
+			<p>Please enter an address to deliever to</p>
+			<%= link_to "Add address", new_address_path %>
+		<% else %>
+			<% current_user.addresses.each do |address| %>
+			<%= f.radio_button :address_id, address.id %>
+				<li>Name: <%= address.name %><br/>
+					Pin: <%= address.pincode %><br/>
+					Street: <%= address.street %><br/>
+					Landmark: <%= address.landmark %><br/>
+					City: <%= address.city %>
+				</li>
+			<% end %>
+			<%= f.submit "Checkout" %>
+		<% end %>
+	<% end %>
+
+<% end %>
