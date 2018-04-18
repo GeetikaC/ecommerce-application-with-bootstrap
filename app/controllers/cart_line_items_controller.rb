@@ -1,7 +1,6 @@
 class CartLineItemsController < ApplicationController
 def index
 	@cart_line_item = CartLineItem.new
-	#same as performing: CartLineItem.where(‘user_id=?’, current_user.id)
 	@cart_line_items = current_user.cart_line_items #to find the cart items of the currently logged in user
 end
 
